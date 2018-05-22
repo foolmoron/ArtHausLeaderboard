@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.password-form {
+    text-align: center;
+}
+.password-form input[type="password"] {
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.28);
+    background-color: #cfe0ff;
+    font-size: 2em;
+    width: 18em;
+}
+
+.btn {
+    text-shadow: 1px 1px black;
+}
+
+/* header */
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 5px;
+    background-color: #999bff;
+}
+.title {
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+}
+.title a {
+    color: white;
+}
+.login {
+    color: #5254ff;
+    font-weight: bold;
+    align-self: center;
+}
+
+/* footer */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 5px;
+    background-color: #999bff;
+}
+
+/* content */
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}

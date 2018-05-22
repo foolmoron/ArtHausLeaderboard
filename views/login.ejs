@@ -1,0 +1,13 @@
+<% var title = 'Login' %>
+<% include header %>
+
+<form class="password-form" method="post">
+    <input type="password" name="password" placeholder="INPUT THE MAGIC WORDS..." value="<%= locals.previousInput %>" />
+    <br><br>
+    <input type="submit" value="CONTROL YOUR DESTINY!">
+</form>
+<% if (locals.error) { %>
+    <div class="password-error"><%= error %></div>
+<% } %>
+
+<% include footer %>

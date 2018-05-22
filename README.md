@@ -1,2 +1,2 @@
-# ArtHausLeaderboard
-ART.HAUS Leaderboard shader + program + server + client
+# Art Haus Leaderboard
+ART.HAUS Leaderboard server

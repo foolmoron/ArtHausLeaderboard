@@ -1,0 +1,6 @@
+*.sublime-project
+*.sublime-workspace
+node_modules/
+bundle.js
+db/
+build/config.gypi
