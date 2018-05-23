@@ -13,6 +13,8 @@ sudo apt-get install gcc g++
 git clone -b server https://github.com/foolmoron/ArtHausLeaderboard.git
 cd ArtHausLeaderboard/
 npm install
+mkdir certs
+sudo certbot certonly --standalone -w certs -d inlight.fool.games
 
 echo "1. Change ports to 8000/4430"
 echo "2. Change config.js secret/pass/host"
