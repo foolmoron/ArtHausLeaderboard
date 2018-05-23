@@ -10,11 +10,9 @@ sudo apt-get install certbot
 sudo apt-get install git
 sudo apt-get install libcairo2-dev libjpeg-turbo8-dev libgif-dev
 sudo apt-get install gcc g++
-git clone -b server https://github.com/foolmoron/Inlight2017.git
-cd Inlight2017/
+git clone -b server https://github.com/foolmoron/ArtHausLeaderboard.git
+cd ArtHausLeaderboard/
 npm install
-mkdir certs
-sudo certbot certonly --standalone -w certs -d inlight.fool.games
 
-echo "1. Change ports to 80/443"
+echo "1. Change ports to 8000/4430"
 echo "2. Change config.js secret/pass/host"
