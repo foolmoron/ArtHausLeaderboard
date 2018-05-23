@@ -11,14 +11,14 @@ public class LeaderboardEntry {
 
 	public string Name;
 	public int Points;
-	public int CreatedTime;
+	public long CreatedTime;
 }
 [Serializable]
 public class LeaderboardPosition {
 	public int TopOffset;
 	public float Scale;
 }
-public class Leaderboard : MonoBehaviour {
+public class Leaderboard : Manager<Leaderboard> {
 	
 	public GameObject EntryPrefab;
 
@@ -34,10 +34,11 @@ public class Leaderboard : MonoBehaviour {
 	
 	void Update() {
 		// sort entries
-		Entries.Sort((e1, e2) => (e2.Points - e1.Points) != 0 ? e2.Points - e1.Points : (e1.CreatedTime - e2.CreatedTime) != 0 ? e1.CreatedTime - e2.CreatedTime : e1.Id - e2.Id);
+		Entries.Sort((e1, e2) => (e2.Points - e1.Points) != 0 ? e2.Points - e1.Points : e1.CreatedTime.CompareTo(e2.CreatedTime) != 0 ? e1.CreatedTime.CompareTo(e2.CreatedTime) : e1.Id - e2.Id);
 		// clear texts with old entries
 		for (int i = 0; i < entryToTexts.Count; i++) {
 			if (!Entries.Contains(entryToTexts.Keys[i])) {
+				Destroy(entryToTexts.Values[i].gameObject);
 				entryToTexts.RemoveAt(i);
 				i--;
 			}
