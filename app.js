@@ -48,7 +48,7 @@ function initCollection(container, name, opts) {
 }
 
 db.loadDatabase({}, () => {
-    initCollection(data, 'leaderboard', { unique: ['uuid'] })
+    initCollection(data, 'players', { unique: ['uuid'] })
 })
 
 const GLOBAL = {
@@ -86,45 +86,58 @@ app.get('/', adminAuth, (req, res, next) => {
     res.render('index', { })
 })
 app.get('/leaderboard', adminAuth, (req, res, next) => {
-    res.render('leaderboard', {
-    })
+    res.render('leaderboard', { })
 })
 
-// app.post('/drawing', (req, res, next) => {
-//     var drawing = data.drawings.findOne({uuid: req.body.uuid})
-//     if (!drawing) {
-//         drawing = Drawing({uuid: req.body.uuid})
-//         data.drawings.insert(drawing)
-//     }
-//     // update model
-//     drawing.json = req.body.json
-//     drawing.empty = ((drawing.json || {}).objects || []).length == 0
-//     drawing.dimensions = req.body.dimensions
-//     if (drawing.status == STATUS.UPDATED || drawing.status == STATUS.APPROVED) {
-//         drawing.status = STATUS.UPDATED
-//     }
-//     var autoapprove = drawing.status != STATUS.IGNORED && (GLOBAL.autoapprove || drawing.autoapprove)
-//     if (autoapprove) {
-//         drawing.status = STATUS.APPROVED
-//     }
-//     data.drawings.update(drawing)
-//     // save to png using minimally cropped dimensions provided by client
-//     canvas.setDimensions({ width: drawing.dimensions.width, height: drawing.dimensions.height })
-//     canvas.loadFromJSON(drawing.json, () => {
-//         // render objects
-//         canvas.renderAll()
-//         // save file
-//         var destStream = fs.createWriteStream(drawingDirNew + drawing.uuid + '.png')
-//         canvas.createPNGStream().on('data', chunk => destStream.write(chunk))
-//         // autoapprove copy file
-//         if (autoapprove) {
-//             var destStream2 = fs.createWriteStream(drawingDirApproved + drawing.uuid + '.png')
-//             canvas.createPNGStream().on('data', chunk => destStream2.write(chunk))
-//         }
-//     })
-//     // return
-//     res.sendStatus(200)
-// })
+const Player = (init) => Object.assign({
+    uuid: uuid(),
+    hue: Math.floor(Math.random() * 360),
+    name: '',
+    points: 0,
+}, init)
+
+function checkPlayer(req, res, next) {
+    var player = data.players.findOne({uuid: req.params.uuid})
+    if (!player) {
+        return res.status(400).json({error : 'invalid player uuid'})
+    }
+    req.player = player
+    next()
+}
+
+app.get('/player/:name', (req, res, next) => {
+    var name = req.params.name
+    var num = 1
+    while (data.players.findOne({name})) {
+        num++
+        name = req.params.name + ' #' + num
+    }
+
+    var newPlayer = Player({name})
+    data.players.insert(newPlayer)
+
+    var player = data.players.findOne({uuid: newPlayer.uuid})
+    data.players.update(player)
+    res.json(player)
+})
+
+app.get('/player/:uuid/points/:pointsToAdd', checkPlayer, (req, res, next) => {
+    var player = req.player
+    player.points += parseInt(req.params.pointsToAdd) || 0
+    player.points = Math.max(0, player.points)
+    data.players.update(player)
+    res.json(player)
+})
+
+app.get('/player/:uuid', checkPlayer, (req, res, next) => {
+    var player = req.player
+    res.json(player)
+})
+app.get('/playerupdates/:sinceTime', (req, res, next) => {
+    var sinceTime = parseInt(req.params.sinceTime) || 0
+    var players = data.players.where(player => player.meta.updated >= sinceTime)
+    res.json({time: new Date().getTime(), players})
+})
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

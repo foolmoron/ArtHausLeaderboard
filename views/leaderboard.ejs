@@ -3,8 +3,11 @@
 
 <div class="container-fluid leaderboard">
     <div class="row">
-        <div class="col-xs-12">
-            NEW USER INPUT ETC
+        <div class="col-xs-9 col-md-5">
+            <input class="player-input" type="text" />
+        </div>
+        <div class="col-xs-3 col-md-2">
+            <div class="btn btn-primary player-button" onclick="addPlayer()">Add Player</div>
         </div>
     </div>
     <div class="filter-container">
@@ -21,13 +24,13 @@
         <div class="col-xs-2 col-md-2">
             <button class="btn btn-warning primary-button" onclick="get('/player/<$= player.uuid $>/points/-1', update)">-</button>
         </div>
-        <div class="col-xs-7 col-md-7 text-center">
+        <div class="col-xs-7 col-md-7 text text-center" style="-webkit-text-stroke-color: hsl(<$= player.hue $>, 100%, 75%);">
             <$= player.name $>
         </div>
-        <div class="col-xs-1 col-md-1 text-center">
+        <div class="col-xs-1 col-md-1 text text-center" style="-webkit-text-stroke-color: hsl(<$= player.hue $>, 100%, 75%);">
             <$= player.points $>
         </div>
-        <div class="col-xs-3 col-md-3">
+        <div class="col-xs-2 col-md-2">
             <button class="btn btn-primary primary-button" onclick="get('/player/<$= player.uuid $>/points/1', update)">+</button>
         </div>
     </div>
@@ -79,20 +82,37 @@ function updatePlayer(uuid) {
     })
 }
 
+// add player
+var addPlayerInput = document.querySelector('.player-input')
+
+function addPlayer() {
+    if (!addPlayerInput.value)  {
+        return
+    }
+    get('/player/' + addPlayerInput.value, xhr => {
+        addPlayerInput.value = ''
+        changeFilterMode(filterPickers[0])
+        update()
+    })
+}
+
 // filter setup
 var filters = {
     // sorted by last updated
     recent: {
-        sort: (item1, item2) => item1.meta.updated - item2.meta.updated,
+        filter: item => true,
+        sort: (item1, item2) => item2.meta.updated - item1.meta.updated,
         items: [],
     },
-    // sorted by points
+    // sorted by points, then by created time
     top: {
-        sort: (item1, item2) => item1.points - item2.points,
+        filter: item => true,
+        sort: (item1, item2) => (item2.points - item1.points) != 0 ? item2.points - item1.points : item1.meta.created - item2.meta.created,
         items: [],
     },
     // sorted alphabetically by name
     abc: {
+        filter: item => true,
         sort: (item1, item2) => item1.name.localeCompare(item2.name),
         items: [],
     },
@@ -102,6 +122,7 @@ var currentFilter = 'recent'
 function updateLists() {
     for (var filterType in filters) {
         var filterObj = filters[filterType]
+        filterObj.items = players.filter(filterObj.filter)
         filterObj.items.sort(filterObj.sort)
     }
 }
@@ -147,8 +168,6 @@ function update() {
 
 // initial pull
 document.addEventListener('DOMContentLoaded', update, false)
-// interval
-var updateInterval = setInterval(update, 1500)
 </script>
 
 <% include footer %>
