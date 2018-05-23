@@ -1,0 +1,154 @@
+<% var title = 'Leaderboard' %>
+<% include header %>
+
+<div class="container-fluid leaderboard">
+    <div class="row">
+        <div class="col-xs-12">
+            NEW USER INPUT ETC
+        </div>
+    </div>
+    <div class="filter-container">
+        <div class="btn" data-filter="recent" data-color="rgb(0, 67, 219)" onclick="changeFilterMode(this)">Recent</div>
+        <div class="btn" data-filter="top" data-color="rgb(0, 189, 219)" onclick="changeFilterMode(this)">Leaders</div>
+        <div class="btn" data-filter="abc" data-color="rgb(228, 8, 211)" onclick="changeFilterMode(this)">Alphabetical</div>
+    </div>
+    <div class="player-container">
+    </div>
+</div>
+
+<script id="player-template" type="text/template">
+    <div class="row player-row data-uuid="<$= player.uuid $>">
+        <div class="col-xs-2 col-md-2">
+            <button class="btn btn-warning primary-button" onclick="get('/player/<$= player.uuid $>/points/-1', update)">-</button>
+        </div>
+        <div class="col-xs-7 col-md-7 text-center">
+            <$= player.name $>
+        </div>
+        <div class="col-xs-1 col-md-1 text-center">
+            <$= player.points $>
+        </div>
+        <div class="col-xs-3 col-md-3">
+            <button class="btn btn-primary primary-button" onclick="get('/player/<$= player.uuid $>/points/1', update)">+</button>
+        </div>
+    </div>
+</script>
+
+<script src="js/ejs.min.js"></script>
+<script>
+var playerContainer = document.querySelector('.player-container')
+var playerTemplate = document.querySelector('#player-template').innerHTML.trim()
+
+var players = []
+
+function renderPlayer(player) {
+    var html = ejs.render(playerTemplate, {player}, {delimiter: '$'})
+    var div = document.createElement('div')
+    div.innerHTML = html
+    var newNode = div.firstChild
+    return newNode
+}
+
+function renderPlayers() {
+    // filter and sort
+    var filteredPlayers = filters[currentFilter].items
+    // render nodes
+    var nodes = filteredPlayers.map(player => {
+        var existingNode = document.querySelector('[data-uuid="' + player.uuid + '"]')
+        if (player.dirty) {
+            if (existingNode) {
+                existingNode.remove()
+            }
+            existingNode = null
+            player.dirty = false
+        }
+        return existingNode || renderPlayer(player)
+    })
+    // hide old nodes
+    Array.from(playerContainer.children).forEach(node => node.style.display = 'none')
+    // add new nodes
+    nodes.forEach(node => {
+        node.style.display = 'block'
+        node.remove()
+        playerContainer.append(node)
+    })
+}
+
+function updatePlayer(uuid) {
+    get('/player/' + uuid, xhr => {
+        renderPlayer(JSON.parse(xhr.responseText))
+    })
+}
+
+// filter setup
+var filters = {
+    // sorted by last updated
+    recent: {
+        sort: (item1, item2) => item1.meta.updated - item2.meta.updated,
+        items: [],
+    },
+    // sorted by points
+    top: {
+        sort: (item1, item2) => item1.points - item2.points,
+        items: [],
+    },
+    // sorted alphabetically by name
+    abc: {
+        sort: (item1, item2) => item1.name.localeCompare(item2.name),
+        items: [],
+    },
+}
+var currentFilter = 'recent'
+
+function updateLists() {
+    for (var filterType in filters) {
+        var filterObj = filters[filterType]
+        filterObj.items.sort(filterObj.sort)
+    }
+}
+
+function changeFilterMode(filterPicker) {
+    currentFilter = filterPicker.dataset.filter
+    // set buttons
+    filterPickers.forEach(picker => { picker.style.opacity = 0.5; picker.style.flexGrow = 1 })
+    filterPicker.style.opacity = 1
+    filterPicker.style.flexGrow = 2
+    // rerender
+    renderPlayers()
+}
+var filterPickers = Array.from(document.querySelectorAll('[data-filter]'))
+filterPickers.forEach(picker => picker.style.backgroundColor = picker.dataset.color)
+changeFilterMode(filterPickers[0])
+
+// update
+var lastUpdateTime = 0
+function update() {
+    get('/playerupdates/' + lastUpdateTime, xhr => {
+        var response = JSON.parse(xhr.responseText)
+        lastUpdateTime = response.time
+        // apply updates to collection
+        response.players.forEach(player => {
+            player.dirty = true
+            for (var i = 0; i < players.length; i++) {
+                if (players[i].uuid == player.uuid) {
+                    players[i] = player
+                    return
+                }
+            }
+            players.push(player)
+        })
+        // update lists
+        updateLists()
+        // render
+        if (response.players.length) {
+            renderPlayers()
+        }
+    })
+}
+
+// initial pull
+document.addEventListener('DOMContentLoaded', update, false)
+// interval
+var updateInterval = setInterval(update, 1500)
+</script>
+
+<% include footer %>

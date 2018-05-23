@@ -48,7 +48,7 @@ function initCollection(container, name, opts) {
 }
 
 db.loadDatabase({}, () => {
-    initCollection(data, 'drawings', { unique: ['uuid'] })
+    initCollection(data, 'leaderboard', { unique: ['uuid'] })
 })
 
 const GLOBAL = {
@@ -72,7 +72,7 @@ app.get('/login', (req, res, next) => {
 app.post('/login', (req, res, next) => {
     if (req.body.password.trim() === config.PASSWORD) {
         req.session.isAdmin = true
-        res.redirect('/drawings')
+        res.redirect('/leaderboard')
     } else {
         res.render('login', { 
             previousInput: req.body.password, 
@@ -150,12 +150,16 @@ http.createServer(app).listen(config.HTTP_PORT, function () {
 ************************************
 ** Started listening on port ${config.HTTP_PORT} **
 ************************************`)
-});
-https.createServer({ key: fs.readFileSync(config.KEY_PATH), cert: fs.readFileSync(config.CERT_PATH) }, app).listen(config.HTTPS_PORT, function () {
-    console.log(`
+})
+var certs = null
+try { certs = { key: fs.readFileSync(config.KEY_PATH), cert: fs.readFileSync(config.CERT_PATH) } } catch (e) {}
+if (certs) {
+    https.createServer(certs, app).listen(config.HTTPS_PORT, function () {
+        console.log(`
 ++++++++++++++++++++++++++++++++++++
 ++ Started listening on port ${config.HTTPS_PORT} ++
 ++++++++++++++++++++++++++++++++++++`)
-});
+    })
+}
 
 module.exports = app

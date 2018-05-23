@@ -15,7 +15,7 @@ body {
     padding: 10px;
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.28);
-    background-color: #cfe0ff;
+    background-color: #ffdacf;
     font-size: 2em;
     width: 18em;
 }
@@ -29,7 +29,7 @@ header {
     display: flex;
     justify-content: space-between;
     padding: 12px 5px;
-    background-color: #999bff;
+    background-color: #ff6464;
 }
 .title {
     color: white;
@@ -40,7 +40,7 @@ header {
     color: white;
 }
 .login {
-    color: #5254ff;
+    color: #ffd473;
     font-weight: bold;
     align-self: center;
 }
@@ -53,7 +53,7 @@ footer {
     display: flex;
     justify-content: space-between;
     padding: 12px 5px;
-    background-color: #999bff;
+    background-color: #ff6464;
 }
 
 /* content */
@@ -63,4 +63,49 @@ footer {
     justify-content: center;
     align-items: center;
     padding: 10px;
+}
+
+/* players */
+.leaderboard {
+    width: 100%;
+}
+.leaderboard .player-row {
+    background-color: #ececec;
+    padding: 10px 0px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.leaderboard button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    white-space: normal;
+}
+.leaderboard .primary-button {
+    height: 195px;
+}
+.leaderboard .secondary-button {
+    height: 60px;
+    margin-bottom: 0px;
+}
+
+.leaderboard .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.leaderboard .filter-container > div {
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 52px;
+    margin: 0px 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    line-height: 2;
+    transition: flex-grow 0.2s;
 }
