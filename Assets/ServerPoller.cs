@@ -57,7 +57,7 @@ public class ServerPoller : Manager<ServerPoller> {
 					entry.Points = player.points;
 				}
 			} else {
-				Debug.LogError(req.error);
+				Debug.LogWarning(req.error);
 			}
 			yield return new WaitForSeconds(PollInterval);
 		}
