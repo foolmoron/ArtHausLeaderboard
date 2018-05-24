@@ -56,7 +56,7 @@ public class Leaderboard : Manager<Leaderboard> {
 		for (int i = 0; i < Entries.Count; i++) {
 			var entry = Entries[i];
 			var text = entryToTexts[entry];
-			text.text = entry.Points + "☆ " + entry.Name;
+			text.text = entry.Points + "★ " + entry.Name;
 			LerpToPosition(text, i, LerpSpeed);
 		}
 	}

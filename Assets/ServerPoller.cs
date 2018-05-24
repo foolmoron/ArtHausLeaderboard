@@ -38,9 +38,10 @@ public class ServerPoller : Manager<ServerPoller> {
 			var req = new WWW(BaseURL + "playerupdates/" + latestPollTime);
 			yield return req;
 			if (req.error == null) {
+				var firstLoad = latestPollTime == 0;
 				var data = JsonUtility.FromJson<PlayerDataContainer>(req.text);
 				// clear initial placeholder leaderboard data if the first server request worked
-				if (latestPollTime == 0) {
+				if (firstLoad) {
 					Leaderboard.Inst.Entries.Clear();
 				}
 				latestPollTime = data.time;
@@ -54,6 +55,14 @@ public class ServerPoller : Manager<ServerPoller> {
 						};
 						Leaderboard.Inst.Entries.Add(entry);
 					}
+					// popups based on point diff
+					if (!firstLoad) {
+						var pointDiff = player.points - entry.Points;
+						for (int i = 0; i < pointDiff; i++) {
+							PopupSpawner.Inst.PopupQueue.Add(entry.Name);
+						}
+					}
+					// set points
 					entry.Points = player.points;
 				}
 			} else {
