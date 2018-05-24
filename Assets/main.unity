@@ -1158,8 +1158,10 @@ MonoBehaviour:
     Scale: 0.55
   - TopOffset: -372
     Scale: 0.45
+  - TopOffset: -540
+    Scale: 0.35
   DefaultScale: 0.35
-  DefaultOffsetStep: -143
+  DefaultOffsetStep: -136
   LerpSpeed: 0.078
   Entries:
   - Name: Test 0

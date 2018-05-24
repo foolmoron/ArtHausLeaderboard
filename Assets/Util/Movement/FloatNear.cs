@@ -9,6 +9,8 @@ public class FloatNear : MonoBehaviour {
     public Vector2 OffsetRange;
     [Range(0, 3f)]
     public float OffsetInterval;
+    [Range(0, 3f)]
+    public float OffsetIntervalVariance;
     float offsetTime;
     [Range(0, 0.3f)]
     public float Speed = 0.1f;
@@ -23,7 +25,7 @@ public class FloatNear : MonoBehaviour {
             offsetTime -= Time.deltaTime;
         } else {
             CurrentOffset = OffsetRange.scaledWith(new Vector2(Random.value - 0.5f, Random.value - 0.5f));
-            offsetTime = OffsetInterval;
+            offsetTime = OffsetInterval + Random.Range(-OffsetIntervalVariance / 2, OffsetIntervalVariance / 2);
         }
         // move
         var target = BaseTarget + CurrentOffset.to3();
