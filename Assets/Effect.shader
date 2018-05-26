@@ -6,6 +6,8 @@
 		_Color1 ("Color 1", Color) = (0.0, 0.8, 0.5, 1)
 		_Color2 ("Color 2", Color) = (0.8, 0.0, 0.2, 1)
 		_DepthMaskMin ("Depth Mask Min", Range(-2, 2)) = 0
+		_Aspect ("Aspect Ratio", Float) = 0.5625
+
 	}
 	SubShader
 	{
@@ -19,6 +21,7 @@
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
+			#include "effect.cginc"
 
 			sampler2D _CameraDepthTexture;
 
@@ -27,6 +30,7 @@
             fixed4 _Color1;
             fixed4 _Color2;
 			float _DepthMaskMin;
+			float _Aspect;
 
 			struct appdata
 			{
@@ -58,6 +62,10 @@
 
 				float depth = Linear01Depth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.screen)).x);
                 fixed4 finalColor = lerp(_Color1, _Color2, step(1 - depth, _DepthMaskMin));
+
+				float4 bgColor = drawEffectA(i.uv, _Time * 10., _ScreenParams.xy);
+				float4 textColor = drawEffectB(i.uv, _Time * 10., _ScreenParams.xy) * 0.8;
+				finalColor = lerp(textColor, bgColor, step(1 - depth, _DepthMaskMin));
 
 				return finalColor;
 			}
