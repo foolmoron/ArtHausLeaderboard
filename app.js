@@ -49,6 +49,7 @@ function initCollection(container, name, opts) {
 
 db.loadDatabase({}, () => {
     initCollection(data, 'players', { unique: ['uuid'] })
+    initCollection(data, 'extras', { unique: ['id'] })
 })
 
 // start backup loop
@@ -138,6 +139,27 @@ app.get('/player/:uuid/points/:pointsToAdd', checkPlayer, (req, res, next) => {
     player.points = Math.max(0, player.points)
     data.players.update(player)
     res.json(player)
+})
+
+app.get('/extras/:id/:pointsToAdd', (req, res, next) => {
+    var extra = data.extras.findOne({id: req.params.id})
+    if (!extra) {
+        extra = {id: req.params.id, value: 0}
+        data.extras.insert(extra)
+        console.log('in ' + extra)
+    }
+    extra.value += parseInt(req.params.pointsToAdd) || 0
+    extra.value = Math.max(0, extra.value)
+    data.extras.update(extra)
+    res.json(extra)
+})
+app.get('/extras/:id', (req, res, next) => {
+    var extra = data.extras.findOne({id: req.params.id})
+    if (!extra) {
+        extra = {id: req.params.id, value: 0}
+        data.extras.insert(extra)
+    }
+    res.json(extra)
 })
 
 app.get('/player/:uuid', checkPlayer, (req, res, next) => {
