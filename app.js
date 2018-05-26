@@ -51,6 +51,17 @@ db.loadDatabase({}, () => {
     initCollection(data, 'players', { unique: ['uuid'] })
 })
 
+// start backup loop
+var pad2 = s => (s.toString().length == 1 ? '0' : '') + s
+var backupInterval = setInterval(function() {
+    var date = new Date()
+    var filename = `db/db_${pad2(date.getFullYear())}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}_${pad2(date.getHours())}-${pad2(date.getMinutes())}-${pad2(date.getSeconds())}.json`
+    fs.createReadStream('db/db.json').pipe(fs.createWriteStream(filename))
+    console.log('BACKUP ' + filename)
+}, 1000*60*5)
+
+// globals
+
 const GLOBAL = {
 }
 
