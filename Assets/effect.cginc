@@ -41,6 +41,9 @@ float getBump (float2 p) {
     return bump;
 }
 
+float3 palette(float3 t, float3 a, float3 b, float3 c, float3 d) {
+    return a + b * cos(2.0 * M_PI * (c * t  + d));
+}
 float3 paletteA (float t) {
     float3 a = float3(0.93,0.43,0.76);
     float3 b = float3(0.90,0.31,0.24);
@@ -62,9 +65,8 @@ float3 paletteC (float t) {
     float3 b = float3(0.81,1.00,0.68);
     float3 c = float3(0.66,0.36,0.03);
     float3 d = float3(0.31,0.56,0.58);
-    return a + b*cos( 2.0*M_PI*(c*t+d));
+    return palette(t,float3(0.56,0.98,0.66),float3(0.96,0.67,0.21),float3(0.51,0.16,0.49),float3(0.70,0.47,0.95));
 }
-
 bool formula (in float2 pixel, in float2 square, in float s) {
     return pixel.x - (s) < square.x && pixel.x + (s) > square.x && pixel.y - (s) < square.y && pixel.y + (s) > square.y;
 }
@@ -159,6 +161,8 @@ float4 drawEffectB(float2 fragCoord, float time, float2 resolution) {
 
     // colorize
     float3 col = 0.5 + 0.5*cos( c.y*6.2831 + float3(0.0,1.0,2.0) );	
+
+    
 	
-    return float4(paletteB(col.r), 1.0);
+    return float4((paletteC(col.r * 0.2) * 0.8) + 0.5, 1.0);
 }
